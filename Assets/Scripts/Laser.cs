@@ -5,7 +5,9 @@ using UnityEngine;
 public class Laser : MonoBehaviour
 {
     // Start is called before the first frame update
+    [SerializeField]
     private float _speed = 20f;
+    private bool _isEnemyLaser = false;
     void Start()
     {
         
@@ -14,10 +16,55 @@ public class Laser : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (_isEnemyLaser == false)
+        {
+            MoveUp();
+        }
+        else
+        {
+            MoveDown();
+        }
+    } 
+    void MoveUp()
+    {
         transform.Translate(Vector3.up * _speed * Time.deltaTime);
         if (transform.position.y > 18)
         {
+            Debug.Log(transform.parent);
+            if (transform.parent != null)
+            {
+                Destroy(transform.parent.gameObject);
+            }
             Destroy(this.gameObject);
         }
     }
+    void MoveDown()
+    {
+        transform.Translate(Vector3.down * _speed * Time.deltaTime);
+        if (transform.position.y < -15)
+        {
+            Debug.Log(transform.parent);
+            if (transform.parent != null)
+            {
+                Destroy(transform.parent.gameObject);
+            }
+            Destroy(this.gameObject);
+        }
+    }
+    public void AssignEnemyLaser()
+    {
+        _isEnemyLaser = true;
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Player" && _isEnemyLaser == true)
+        {
+            Player player = collision.GetComponent<Player>();
+            if (player != null)
+            {
+                player.Damage();
+            }
+        }
+    }
+
 }
